@@ -1,25 +1,37 @@
 const WebSocket = require('ws');
-const { v4: uuidv4 } = require('uuid');
-const SignalerServer = require('signaler-server');
+const SignalerServer = require('./signaler-server');
 
-const wss = new WebSocket.Server({ port: 8000 });
-const clients = new Map();
+process.on('uncaughtException', (err) => {
+    console.log('Caught exception: ' + err);
+});
+
+const wss = new WebSocket.Server({ port: 8080 });
 
 wss.on('connection', (ws) => {
     let protocol = ws.protocol
-    const id = uuidv4();
-    const color = Math.floor(Math.random() * 360);
-    const client = { id, color, ws };
 
-    clients.set(ws, client);
+    SignalerServer.Clients.Add(ws)
 
     ws.on('message', (messageAsString) => {
-        const msg = JSON.parse(messageAsString);
-        const client = clients.get(ws);
+		try {
+			const msg = JSON.parse(messageAsString);
+			let method = SignalerServer.ProtocolMethods[msg.cmd]
 
-        let method = SignalerServer[msg.cmd]
-        if (method != null)
-            method(client, msg)
+			const client = SignalerServer.Clients.Get(ws);
+
+			if (client!=null && method != null)
+				method(client, msg)
+		}
+		catch (ex) {
+			console.log(ex)
+		}
     })
 
+	ws.on('pong', ()=>{
+		SignalerServer.Clients.Pong(ws)
+	})
+
+	ws.on('close', async ()=>{
+		SignalerServer.Clients.Remove(ws)
+	})
 })
