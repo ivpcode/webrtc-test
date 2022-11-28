@@ -3,8 +3,11 @@ const { v4: uuidv4 } = require('uuid');
 const interval = setInterval(() => {
 	for (var entry of SignalerServer._ConnectedClients.entries()) {
 		var ws = entry[0]
-		if (ws.isAlive === false) 
-			return ws.terminate();
+		
+		if (ws.isAlive === false) {
+			ws.terminate();
+			continue;
+		}
 
 		ws.isAlive = false;
 		ws.ping();
