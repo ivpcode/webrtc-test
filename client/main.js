@@ -1,55 +1,47 @@
-import SignalingChannel from 'signaling-channel'
+import P2PCall from "./p2p-call"
 
-const signaling = new SignalingChannel(); // handles JSON.stringify/parse
-const constraints = {audio: true, video: true};
-const configuration = {iceServers: [{urls: 'stun:stun.example.org'}]};
-const pc = new RTCPeerConnection(configuration);
+async function GetLocalVideo() {
+	try {
+		const constraints = {audio: true, video: true};
+		const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
-// call start() anytime on either end to add camera and microphone to connection
-async function start() {
-  try {
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    for (const track of stream.getTracks()) {
-      pc.addTrack(track, stream);
-    }
-    selfView.srcObject = stream;
-  } catch (err) {
-    console.error(err);
-  }
+		let video = document.createElement("video")
+		video.playsinline = true
+		video.autoplay = true
+		video.muted = true  
+		document.querySelector(".videos_container").append(video)
+		video.srcObject = stream;
+
+		return stream
+
+	} catch (err) {
+		console.error(err);
+	}
 }
 
-pc.ontrack = ({track, streams}) => {
-  // once media for a remote track arrives, show it in the remote video element
-  track.onunmute = () => {
-    // don't set srcObject again if it is already set.
-    if (remoteView.srcObject) return;
-    remoteView.srcObject = streams[0];
-  };
-};
+window.addEventListener("DOMContentLoaded", async ()=>{
 
-// - The perfect negotiation logic, separated from the rest of the application ---
+	// Il server invia il messaggio OnClientConnected a tutti i client della stanza appena un nuovo client si connette
+	// Il client Appena riceve il OnNewClient crea il peer_connection dedicato
+	// Il peer_connection dedicato crea la offer e la invia e poi invia i candidates
+	// Quando riceve la answer dal client_id_xxx setta la answer 
+	// Quando riceve i candidates dal client_id_xxx setta il candidate
+	
+	// Il server invia il messaggio OnClientDisconnected a tutti i client della stanza appena un nuovo client chiude la connessione
+	// Questo ultimo messaggio potrebbe anche essere bypassato e gestito lato peer
 
-// keep track of some negotiation state to prevent races and errors
-let makingOffer = false;
-let ignoreOffer = false;
-let isSettingRemoteAnswerPending = false;
 
-// send any ice candidates to the other peer
-pc.onicecandidate = ({candidate}) => signaling.send({candidate});
+	//await SignalingClient.Connect("wss://ivpcode-turbo-adventure-vr974vpvjr5cpr7w-8080.preview.app.github.dev/")
 
-// let the "negotiationneeded" event trigger offer generation
-pc.onnegotiationneeded = async () => {
-  try {
-    makingOffer = true;
-    await pc.setLocalDescription();
-    signaling.send({description: pc.localDescription});
-  } catch (err) {
-     console.error(err);
-  } finally {
-    makingOffer = false;
-  }
-};
+	let ls = await GetLocalVideo()
+	
+	P2PCall.SetLocalStream(ls)
+})
 
+  let makingOffer = false;
+  let ignoreOffer = false;
+  let isSettingRemoteAnswerPending = false;
+/*
 signaling.onmessage = async ({data: {description, candidate}}) => {
   try {
     if (description) {
@@ -83,3 +75,4 @@ signaling.onmessage = async ({data: {description, candidate}}) => {
     console.error(err);
   }
 }
+*/

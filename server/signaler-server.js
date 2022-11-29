@@ -64,8 +64,12 @@ module.exports = SignalerServer = {
 
 	ProtocolMethods: {
 
-		OFFER: async (sender_client, msg)=> {
+		OFFER_REQUEST: async (sender_client, msg)=> {
 			SignalerServer.Broadcast(sender_client, msg)
+		},
+
+		OFFER: async (sender_client, msg)=> {
+			SignalerServer.SendTo(sender_client.id, msg.destination_id, msg)
 		},
 
 		ANSWER: async (sender_client, msg)=> {
