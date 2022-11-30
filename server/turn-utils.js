@@ -1,6 +1,7 @@
 const crypto = require('crypto')
 const loadIniFile = require('read-ini-file')
 
+// https://www.metered.ca/blog/coturn/
 
 class TurnUtils {
 
