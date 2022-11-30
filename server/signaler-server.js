@@ -44,17 +44,21 @@ module.exports = SignalerServer = {
 	},
 
 	Clients: {
-		Add: (ws)=>{
+		Add: async (ws)=>{
 			ws.isAlive = true
-			SignalerServer._ConnectedClients.set(ws, { "id": uuidv4(), "ws": ws });
+			let new_client = { "id": uuidv4(), "ws": ws }
+			await SignalerServer.Broadcast(new_client, { cmd: "NEW_PEER" })
+			SignalerServer._ConnectedClients.set(ws, new_client);
 		},
 
 		Get: (ws)=>{
 			return SignalerServer._ConnectedClients.get(ws);
 		},
 
-		Remove: (ws) => {
+		Remove: async (ws) => {
+			let removed_client = SignalerServer._ConnectedClients.get(ws)
 			SignalerServer._ConnectedClients.delete(ws)
+			await SignalerServer.Broadcast(removed_client, { cmd: "REMOVE_PEER" })
 		},
 
 		Pong: (ws) => {
@@ -63,10 +67,6 @@ module.exports = SignalerServer = {
 	},
 
 	ProtocolMethods: {
-
-		OFFER_REQUEST: async (sender_client, msg)=> {
-			SignalerServer.Broadcast(sender_client, msg)
-		},
 
 		OFFER: async (sender_client, msg)=> {
 			SignalerServer.SendTo(sender_client.id, msg.destination_id, msg)
@@ -77,7 +77,7 @@ module.exports = SignalerServer = {
 		},
 
 		CANDIDATE: async (sender_client, msg)=> {
-			SignalerServer.Broadcast(sender_client, msg)
+			SignalerServer.SendTo(sender_client.id, msg.destination_id, msg)
 		}
 	},
 

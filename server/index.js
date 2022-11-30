@@ -7,10 +7,10 @@ process.on('uncaughtException', (err) => {
 
 const wss = new WebSocket.Server({ port: 8080 });
 
-wss.on('connection', (ws) => {
+wss.on('connection', async (ws) => {
     let protocol = ws.protocol
 
-    SignalerServer.Clients.Add(ws)
+    await SignalerServer.Clients.Add(ws)
 
     ws.on('message', (messageAsString) => {
 		try {
@@ -32,6 +32,6 @@ wss.on('connection', (ws) => {
 	})
 
 	ws.on('close', async ()=>{
-		SignalerServer.Clients.Remove(ws)
+		await SignalerServer.Clients.Remove(ws)
 	})
 })

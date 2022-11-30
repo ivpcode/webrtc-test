@@ -1,22 +1,37 @@
-import P2PCall from "./p2p-call"
+import RoomConnection from "./room-connection"
 
-async function GetLocalVideo() {
+let room_connection = null
+
+async function GetLocalStream() {
 	try {
 		const constraints = {audio: true, video: true};
 		const stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-		let video = document.createElement("video")
-		video.playsinline = true
-		video.autoplay = true
-		video.muted = true  
-		document.querySelector(".videos_container").append(video)
-		video.srcObject = stream;
 
 		return stream
 
 	} catch (err) {
 		console.error(err);
 	}
+}
+
+async function AddVideo(peer_id, stream) {
+	let video = document.getElementById(peer_id)
+	if (video == null) {
+		video = document.createElement("video")
+		video.setAttribute("id",peer_id)
+		document.querySelector(".videos_container").append(video)
+	}
+	
+	video.playsinline = "playsinline"
+	video.autoplay = true
+	video.muted = "muted"  
+	video.srcObject = stream;
+}
+
+function RemoveVideo(peer_id) {
+	let video = document.getElementById(peer_id)
+	if (video != null)
+		video.remove()
 }
 
 window.addEventListener("DOMContentLoaded", async ()=>{
@@ -33,9 +48,20 @@ window.addEventListener("DOMContentLoaded", async ()=>{
 
 	//await SignalingClient.Connect("wss://ivpcode-turbo-adventure-vr974vpvjr5cpr7w-8080.preview.app.github.dev/")
 
-	let ls = await GetLocalVideo()
-	
-	P2PCall.SetLocalStream(ls)
+	let ls = await GetLocalStream()
+	//AddVideo("Local_Stream",ls)
+
+	room_connection = new RoomConnection()
+	window.room_connection = room_connection
+
+	await room_connection.SetLocalStream(ls)
+	room_connection.AddRemoteStream = async (remote_peer_id,stream) => {
+		AddVideo(remote_peer_id,stream)
+	}
+	room_connection.RemoveRemoteStream = async (remote_peer_id) => {
+		RemoveVideo(remote_peer_id)
+	}
+	await room_connection.Connect("wss://ivpcode-turbo-adventure-vr974vpvjr5cpr7w-8080.preview.app.github.dev/")
 })
 
   let makingOffer = false;
