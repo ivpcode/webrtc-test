@@ -2,7 +2,7 @@ import PeerConnection from "./peer-connection";
 
 export default class RoomConnection {
 
-	constructor() {
+	constructor(RoomHash) {
 		this.peer_connections = {}
 	}
 
@@ -30,16 +30,14 @@ export default class RoomConnection {
 
 	async SetLocalStream(stream) {
 		this.local_stream = stream
-
-		//new PeerConnection(123, this.local_stream, this)
 	}
 
 	async AddRemoteStream(remote_peer_id, stream) {
-
+		// Funzione stub da overloadare nella business logic
 	}
 
 	async RemoveRemoteStream(remote_peer_id) {
-		
+		// Funzione stub da overloadare nella business logic
 	}
 
 	async Send(msg) {
