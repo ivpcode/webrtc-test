@@ -3,11 +3,11 @@ import RoomConnection from "./room-connection"
 window.addEventListener("DOMContentLoaded", async ()=>{
 
 	let ls = await GetLocalStream()
-	AddVideo("Local_Stream",ls)
+	//AddVideo("Local_Stream",ls)
 
 	window.room_connection = new RoomConnection()
 
-	await window.room_connection.SetLocalStream(ls)
+	//await window.room_connection.SetLocalStream(ls)
 	window.room_connection.AddRemoteStream = async (remote_peer_id,stream) => {
 		AddVideo(remote_peer_id,stream)
 	}

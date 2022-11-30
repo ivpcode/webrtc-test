@@ -35,7 +35,7 @@ export default class RoomConnection {
 	}
 
 	async AddRemoteStream(remote_peer_id, stream) {
-		
+
 	}
 
 	async RemoveRemoteStream(remote_peer_id) {
@@ -106,6 +106,8 @@ export default class RoomConnection {
 				let pc = this.peer_connections[msg.sender_id]
 				if (pc == null)
 					return
+
+				await pc.AddIceCandidate(msg.data)
 			}
 		}
 

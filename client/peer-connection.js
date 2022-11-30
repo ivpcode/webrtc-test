@@ -22,18 +22,16 @@ export default class PeerConnection {
 			this.data_channel.onopen = (e) => { console.log("onopen"); console.log(e) };
 			this.data_channel.onclose = (e) => { console.log("onclose"); console.log(e) };
 		}
-
 	}
 	
 	async StartConnectionNegotiation() {
-		if (this.local_stream == null) {
-			
-			this.data_channel = await this._peer_connection.createDataChannel(this.remote_peer_id)
-			this.data_channel.onmessage = (msg) => { console.log("onmessage"); console.log(msg) };
-			this.data_channel.onopen = (e) => { console.log("onopen"); console.log(e) };
-			this.data_channel.onclose = (e) => { console.log("onclose"); console.log(e) };
-			return 
-		}
+		this.data_channel = await this._peer_connection.createDataChannel(this.remote_peer_id)
+		this.data_channel.onmessage = (msg) => { console.log("onmessage"); console.log(msg) };
+		this.data_channel.onopen = (e) => { console.log("onopen"); console.log(e) };
+		this.data_channel.onclose = (e) => { console.log("onclose"); console.log(e) };
+
+		if (this.local_stream == null)
+			return
 
 		for (const track of this.local_stream.getTracks()) {
 			this._peer_connection.addTrack(track, this.local_stream);
@@ -67,13 +65,14 @@ export default class PeerConnection {
 	async SetRemoteAnswer(answer) {
 		let desc = new RTCSessionDescription(answer)
 		await this._peer_connection.setRemoteDescription(desc)
-		this.data_channel = await this._peer_connection.createDataChannel(this.remote_peer_id)
-		this.data_channel.onmessage = (msg) => { console.log("onmessage"); console.log(msg) };
-		this.data_channel.onopen = (e) => { console.log("onopen"); console.log(e) };
-		this.data_channel.onclose = (e) => { console.log("onclose"); console.log(e) };
+	}
+
+	async AddIceCandidate(candidate) {
+		await this._peer_connection.addIceCandidate(candidate)
 	}
 
 	async _OnNegotiationNeedded() {
+
 		try {
 			this.local_offer = await this._peer_connection.createOffer()
 			
