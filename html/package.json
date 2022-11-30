@@ -1,0 +1,25 @@
+{
+  "name": "html",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "files_to_build": "index.html",
+  "scripts": {
+    "dev": "parcel  $npm_package_files_to_build  --no-hmr --public-url /dev",
+    "build": "rm -rf ./public && parcel build $npm_package_files_to_build --out-dir ./public --no-source-maps"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cssnano": "^4.1.11",
+    "postcss": "^8.3.11",
+    "posthtml-include": "^1.7.1",
+    "sass": "^1.42.1"
+  },
+  "browserslist": [
+    "since 2017-06"
+  ],
+  "dependencies": {
+    "axios": "^1.2.0"
+  }
+}
