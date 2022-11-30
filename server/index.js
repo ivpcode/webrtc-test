@@ -1,10 +1,9 @@
-const WebSocket = require('ws');
-const SignalerServer = require('./signaler-server');
-
 process.on('uncaughtException', (err) => {
     console.log('Caught exception: ' + err);
-});
+})
 
+const WebSocket = require('ws');
+const SignalerServer = require('./signaler-server');
 
 const wss = new WebSocket.Server({ port: 8080 });
 
