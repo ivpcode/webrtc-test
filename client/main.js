@@ -3,17 +3,22 @@ import RoomConnection from "./room-connection"
 window.addEventListener("DOMContentLoaded", async ()=>{
 
 	let ls = await GetLocalStream()
-	//AddVideo("Local_Stream",ls)
+
+	//** Rimuovendo questa linea no si ha il proprio video nello schermo, ma solo quelli remoti */
+	//AddVideo("Local_Stream",ls) 
 
 	window.room_connection = new RoomConnection()
 
+	/** Rimuovendo la linea seguente si ha una connessione WebRTc senza stream audio-video */ 
 	//await window.room_connection.SetLocalStream(ls)
+	
 	window.room_connection.AddRemoteStream = async (remote_peer_id,stream) => {
 		AddVideo(remote_peer_id,stream)
 	}
 	window.room_connection.RemoveRemoteStream = async (remote_peer_id) => {
 		RemoveVideo(remote_peer_id)
 	}
+	
 	await window.room_connection.Connect("wss://ivpcode-turbo-adventure-vr974vpvjr5cpr7w-8080.preview.app.github.dev/")
 })
 
