@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "read-ini-file": "^3.0.1",
     "uuid": "^9.0.0",
     "ws": "^8.11.0"
   }

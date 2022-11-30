@@ -1,4 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
+const TurnUtils = require("./turn-utils")
 
 const interval = setInterval(() => {
 	for (var entry of SignalerServer._ConnectedClients.entries()) {
@@ -13,6 +14,8 @@ const interval = setInterval(() => {
 		ws.ping();
 	}
 }, 10000);
+
+let TurnServerConf = TurnUtils.LoadTurnserverConf("/etc/turnserver.conf")
 
 module.exports = SignalerServer = {
 
@@ -47,6 +50,12 @@ module.exports = SignalerServer = {
 		Add: async (ws)=>{
 			ws.isAlive = true
 			let new_client = { "id": uuidv4(), "ws": ws }
+
+			ws.send(JSON.stringify({ 
+				cmd:"CONFIG", 
+				data: TurnUtils.CreateCredentials(`turn:${TurnServerConf["realm"]}:${TurnServerConf["listening-port"]}`, new_client.id, TurnServerConf["static-auth-secret"]) 
+			}))
+
 			await SignalerServer.Broadcast(new_client, { cmd: "NEW_PEER" })
 			SignalerServer._ConnectedClients.set(ws, new_client);
 		},

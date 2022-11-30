@@ -3,7 +3,11 @@ export default class PeerConnection {
 	constructor(RemotePeerId, LocalStream, Signaling, Configuration) {
 
 		if (Configuration == null)
-			Configuration = {iceServers: [{urls: 'stun:stun.example.org'}]};
+			Configuration = {
+				iceServers: [
+					{ urls: 'stun:stun.l.google.com:19302' }
+				]
+			};
 
 		this.remote_peer_id = RemotePeerId
 		this.local_stream = LocalStream

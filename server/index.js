@@ -5,6 +5,7 @@ process.on('uncaughtException', (err) => {
     console.log('Caught exception: ' + err);
 });
 
+
 const wss = new WebSocket.Server({ port: 8080 });
 
 wss.on('connection', async (ws) => {
@@ -12,6 +13,7 @@ wss.on('connection', async (ws) => {
 
     await SignalerServer.Clients.Add(ws)
 
+	
     ws.on('message', (messageAsString) => {
 		try {
 			const msg = JSON.parse(messageAsString);

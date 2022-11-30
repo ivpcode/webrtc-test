@@ -4,6 +4,15 @@ export default class RoomConnection {
 
 	constructor(RoomHash) {
 		this.peer_connections = {}
+		this.peer_connection_config = {
+			iceServers: [
+				{ urls: "stun:stun.l.google.com:19302" },
+				{ urls: "stun:stun1.l.google.com:19302" },
+				{ urls: "stun:stun2.l.google.com:19302" },
+				{ urls: "stun:stun3.l.google.com:19302" },
+				{ urls: "stun:stun4.l.google.com:19302" },
+			]
+		}
 	}
 
 	async Connect(ServerUrl) {
@@ -71,7 +80,7 @@ export default class RoomConnection {
 	Protocol(cmd) {
 		switch (cmd) {
 			case "NEW_PEER": return async (ws, msg) => {
-				this.peer_connections[msg.sender_id] = new PeerConnection(msg.sender_id, this.local_stream, this)
+				this.peer_connections[msg.sender_id] = new PeerConnection(msg.sender_id, this.local_stream, this, this.peer_connection_config)
 				await this.peer_connections[msg.sender_id].StartConnectionNegotiation()
 			}
 
@@ -85,7 +94,7 @@ export default class RoomConnection {
 			case "OFFER": return async (ws, msg) => {
 				let pc = this.peer_connections[msg.sender_id]
 				if (pc == null) {
-					this.peer_connections[msg.sender_id] = new PeerConnection(msg.sender_id, this.local_stream, this)
+					this.peer_connections[msg.sender_id] = new PeerConnection(msg.sender_id, this.local_stream, this, this.peer_connection_config)
 					pc = this.peer_connections[msg.sender_id]
 				}
 
@@ -106,6 +115,10 @@ export default class RoomConnection {
 					return
 
 				await pc.AddIceCandidate(msg.data)
+			}
+
+			case "CONFIG": return async (ws, msg) => {
+				this.peer_connection_config.iceServers.push(msg.data)
 			}
 		}
 
